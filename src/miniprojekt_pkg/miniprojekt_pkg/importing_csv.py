@@ -18,7 +18,7 @@ class CSVImportNode(Node):
         self.timeSend = Int64()
 
         # Import data from csv file into a 2D array
-        with open('/home/drone/Desktop/ros2_miniprojekt/src/miniprojekt_pkg/miniprojekt_pkg/procssing_times_table.csv') as csv_file:
+        with open('./src/miniprojekt_pkg/miniprojekt_pkg/procssing_times_table.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=';')
             for count, row in enumerate(csv_reader):
                 if count != 0:
@@ -29,7 +29,11 @@ class CSVImportNode(Node):
         self.get_logger().info("CSV Import Node received message from server.")
         self.get_logger().info("Sending message to palette time topic.")
         # Get the processing time based on pallete ID and PLC ID
-        self.timeSend.data = int(self.timeArray[msg.data[0]- 1][msg.data[1] - 1])
+        # if the pallete ID or PLC ID are higher than 16 just return 0
+        if msg.data[0] <= 16 and msg.data[1] <= 16:
+            self.timeSend.data = int(self.timeArray[msg.data[0]- 1][msg.data[1] - 1])
+        else:
+            self.timeSend.data = 0
 
         self.get_logger().info("Sending wait time of: " + str(self.timeSend.data) + " ms.")
         # Creating a timer that continously publishes the processing time 

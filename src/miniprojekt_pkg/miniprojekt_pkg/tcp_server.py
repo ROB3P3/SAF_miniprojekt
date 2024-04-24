@@ -2,6 +2,7 @@
 import rclpy
 import socket
 import xml.sax
+import csv
 from rclpy.node import Node
 from std_msgs.msg import String
 from std_msgs.msg import Int64MultiArray
@@ -70,6 +71,16 @@ class TCPServerNode(Node):
             client_socket.send(messageSend.to_bytes(2, byteorder='little'))
             self.get_logger().info("Sent: %s" % str(messageSend.to_bytes(2, byteorder='little')))
 
+            # Write the data received to a CSV file
+            csvDataHeader = ["date", "time", "pallete id", "plc id", "processing time"]
+            with open('data.csv', 'a') as file:
+                csvDictWriter = csv.DictWriter(file, csvDataHeader)
+                file.seek(0, 2)
+                if file.tell() == 0:
+                    csvDictWriter.writeheader()
+                csvDictWriter.writerow({"date": '-'.join(self.xmlContentList[1][1][3:].split("-")[0:3]), "time": self.xmlContentList[1][1][3:].split("-")[-1], "pallete id": self.xmlContentList[0][1], "plc id": self.xmlContentList[2][1], "processing time": self.waitTime})
+
+            self.waitTime = None
             # Close the connection
             client_socket.close()
 
