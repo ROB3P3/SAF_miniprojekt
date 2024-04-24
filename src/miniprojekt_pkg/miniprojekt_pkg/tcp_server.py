@@ -31,7 +31,7 @@ class TCPServerNode(Node):
         self.serverSocket.listen()
         while True:
             # Establish a connection
-            self.get_logger().info("Waiting for a connection...")
+            self.get_logger().info("Waiting for a connection....")
             client_socket, addr = self.serverSocket.accept()
 
             self.get_logger().info("Got a connection from %s" % str(addr))
